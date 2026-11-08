@@ -1,0 +1,438 @@
+<title>Recibo Executivo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="apple-touch-icon" href="data:image/png;base64,/*ICONE*/">
+<link rel="icon" href="data:image/png;base64,/*ICONE*/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Narrow:wght@600&display=swap">
+<style>
+/* Layout: formulário de uma coluna para o celular, barra de ação fixa embaixo, cores do recibo impresso */
+:root {
+  --bg: #f4f5f8;
+  --surface: #ffffff;
+  --fg: #172033;
+  --muted: #5b6475;
+  --line: #d9dde5;
+  --navy: #1f2a44;
+  --on-navy: #ffffff;
+  --gold: #a07c45;
+  --gold-soft: #f3ebdd;
+  --ok: #1d7a4a;
+  --err: #b42318;
+  --font-ui: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-label: "Archivo Narrow", "Archivo", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1420; --surface: #182031; --fg: #e8ebf2; --muted: #9aa3b5; --line: #2c364b;
+    --navy: #2d3d63; --on-navy: #ffffff; --gold: #d2ac70; --gold-soft: #2b2619;
+    --ok: #5cc28c; --err: #f08b80; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1420; --surface: #182031; --fg: #e8ebf2; --muted: #9aa3b5; --line: #2c364b;
+  --navy: #2d3d63; --on-navy: #ffffff; --gold: #d2ac70; --gold-soft: #2b2619;
+  --ok: #5cc28c; --err: #f08b80; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 16px;
+  line-height: 1.45; -webkit-text-size-adjust: 100%;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--navy);
+}
+.topo {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--navy); color: var(--on-navy);
+  padding-block: 12px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.topo-in { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+.logo { width: 42px; height: 42px; border-radius: 10px; flex: none; }
+.topo h1 { font-size: 19px; margin: 0; font-weight: 700; letter-spacing: .2px; flex: 1; }
+.topo h1 small { display: block; font-size: 12px; font-weight: 500; color: var(--gold); letter-spacing: .6px; text-transform: uppercase; }
+.num { display: flex; flex-direction: column; align-items: flex-end; font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: #c9cfdc; }
+.num input {
+  width: 92px; text-align: center; font: 600 17px var(--font-ui); font-variant-numeric: tabular-nums;
+  border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); color: var(--on-navy);
+  border-radius: 8px; padding: 6px 8px;
+}
+main {
+  max-width: 720px; margin: 0 auto; padding-block: 16px 140px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 22px;
+}
+.ditado { background: var(--gold-soft); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.ditado h2 { margin: 0; font-size: 18px; }
+.ditado p { margin: 0; color: var(--muted); font-size: 14px; }
+.mic { display: inline-flex; vertical-align: -3px; width: 18px; height: 18px; color: var(--gold); }
+textarea, input, select {
+  width: 100%; font: 17px var(--font-ui); color: var(--fg); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 10px; padding: 12px; min-width: 0;
+}
+textarea { min-height: 110px; resize: vertical; }
+textarea:focus, input:focus, button:focus-visible, summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 13px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; color: var(--ok); }
+.secao { display: flex; flex-direction: column; gap: 12px; }
+.secao h3 {
+  margin: 0; font: 600 13px var(--font-label); text-transform: uppercase; letter-spacing: 1.4px; color: var(--gold);
+  padding-bottom: 6px; border-bottom: 1px solid var(--line);
+}
+.grade { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grade > .largo { grid-column: 1 / -1; }
+@media (max-width: 480px) { .grade { grid-template-columns: 1fr; } }
+label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); min-width: 0; }
+label.erro input { border-color: var(--err); }
+.total {
+  background: var(--navy); color: var(--on-navy); border-radius: 14px; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.total strong { font-size: 26px; font-variant-numeric: tabular-nums; }
+.total span { font-size: 13px; color: #c9cfdc; }
+button { font: 600 16px var(--font-ui); border-radius: 12px; padding: 13px 16px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+button.primario { background: var(--navy); color: var(--on-navy); border-color: var(--navy); }
+button.ouro { background: var(--gold); color: #fff; border-color: var(--gold); }
+button:disabled { opacity: .55; }
+.acoes {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--surface); border-top: 1px solid var(--line);
+  padding-top: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.acoes-in { max-width: 720px; margin: 0 auto; display: flex; gap: 10px; }
+.acoes-in .primario { flex: 1; font-size: 17px; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 4px 16px; }
+details[open] { padding-bottom: 16px; }
+summary { cursor: pointer; font-weight: 600; padding: 12px 0; list-style: none; display: flex; justify-content: space-between; gap: 8px; }
+summary::-webkit-details-marker { display: none; }
+summary span { color: var(--muted); font-weight: 400; font-size: 14px; }
+.hist { display: flex; flex-direction: column; }
+.hist-item { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.hist-item b { font-variant-numeric: tabular-nums; }
+.hist-item small { color: var(--muted); grid-column: 1 / -1; overflow-wrap: anywhere; }
+.hist-item .botoes { grid-column: 1 / -1; display: flex; gap: 8px; }
+.hist-item .botoes button { padding: 8px 12px; font-size: 14px; }
+.vazio { color: var(--muted); font-size: 14px; padding: 8px 0; }
+.passos { margin: 0; padding-left: 20px; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
+.aviso {
+  position: fixed; left: 50%; transform: translateX(-50%); z-index: 20; width: calc(100% - 32px); max-width: 560px;
+  bottom: calc(86px + env(safe-area-inset-bottom, 0px)); background: var(--fg); color: var(--bg);
+  border-radius: 12px; padding: 12px 16px; font-size: 15px; box-shadow: 0 6px 24px rgba(0,0,0,.25);
+}
+@media (prefers-reduced-motion: no-preference) { .aviso { transition: opacity .2s; } }
+</style>
+
+<header class="topo">
+  <div class="topo-in">
+    <img class="logo" alt="" src="data:image/png;base64,/*ICONE*/">
+    <h1><small>Transporte executivo</small>Recibo Executivo</h1>
+    <div class="num"><label for="numero" style="color:inherit">Recibo nº</label><input id="numero" inputmode="numeric" value="1"></div>
+  </div>
+</header>
+
+<main>
+  <section class="ditado" aria-labelledby="t-ditado">
+    <h2 id="t-ditado">Ditar o recibo</h2>
+    <p>Toque na caixa e depois no
+      <svg class="mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      <b>microfone do teclado</b>. Fale o nome de cada campo e o valor.</p>
+    <textarea id="ditado" placeholder="Ex.: passageiro João da Silva, origem Aeroporto de Guarulhos, destino Avenida Paulista 1000, hora 14:30, valor 250 reais, pedágio 18 reais, pagamento PIX"></textarea>
+    <button class="ouro" id="aplicar" type="button">Preencher campos</button>
+    <div class="chips" id="chips" aria-live="polite"></div>
+  </section>
+
+  <form id="form" class="secao" novalidate>
+    <div class="secao">
+      <h3>Passageiro</h3>
+      <div class="grade" id="g-passageiro"></div>
+    </div>
+    <div class="secao">
+      <h3>Viagem</h3>
+      <div class="grade" id="g-viagem"></div>
+    </div>
+    <div class="secao">
+      <h3>Valores</h3>
+      <div class="grade" id="g-valores"></div>
+      <div class="total"><strong id="total">R$ 0,00</strong><span id="extenso">Total do recibo</span></div>
+    </div>
+    <div class="secao">
+      <h3>Observações</h3>
+      <div class="grade" id="g-obs"></div>
+    </div>
+  </form>
+
+  <details id="d-motorista">
+    <summary>Meus dados (motorista) <span id="m-resumo">não cadastrado</span></summary>
+    <div class="grade" id="g-motorista"></div>
+    <p class="vazio">Aparecem no cabeçalho e na assinatura de todos os recibos.</p>
+    <button type="button" class="primario" id="salvar-m">Salvar meus dados</button>
+  </details>
+
+  <details id="d-hist">
+    <summary>Histórico <span id="h-resumo">nenhum recibo</span></summary>
+    <div class="hist" id="hist"><p class="vazio">Os recibos gerados aparecem aqui, com segunda via e "repetir viagem".</p></div>
+  </details>
+
+  <details>
+    <summary>Como imprimir no iPhone</summary>
+    <ol class="passos">
+      <li>Toque em <b>Gerar PDF</b> e confirme para salvar o arquivo.</li>
+      <li>Abra o PDF (app Arquivos ou o aviso de download).</li>
+      <li>Toque em <b>Compartilhar</b> e depois em <b>Imprimir</b>.</li>
+      <li>Escolha a impressora AirPrint e o papel <b>A4</b>.</li>
+    </ol>
+    <p class="vazio">O iPhone imprime por AirPrint (Wi-Fi ou Wi-Fi Direct da impressora). Ele não imprime por Bluetooth.</p>
+  </details>
+</main>
+
+<div class="acoes">
+  <div class="acoes-in">
+    <button type="button" id="limpar">Limpar</button>
+    <button type="button" class="primario" id="gerar">Gerar PDF</button>
+  </div>
+</div>
+<div class="aviso" id="aviso" role="status" hidden></div>
+
+<script>/*API_DART*/</script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const GRUPOS = {
+    passageiro: 'g-passageiro', documento: 'g-passageiro', empresa: 'g-passageiro',
+    data: 'g-viagem', hora: 'g-viagem', origem: 'g-viagem', destino: 'g-viagem', km: 'g-viagem', pagamento: 'g-viagem',
+    valor: 'g-valores', pedagio: 'g-valores', estacionamento: 'g-valores', outros: 'g-valores',
+    observacoes: 'g-obs',
+  };
+  const LARGOS = new Set(['passageiro', 'empresa', 'origem', 'destino', 'observacoes']);
+  const OBRIG = new Set(['passageiro', 'valor']);
+  const MOTORISTA = [
+    ['nome', 'Nome ou razão social *', true], ['documento', 'CPF ou CNPJ *', false, 'numeric'],
+    ['telefone', 'Telefone / WhatsApp', false, 'tel'], ['email', 'E-mail', false, 'email'],
+    ['endereco', 'Endereço', true], ['cidade', 'Cidade de emissão', false], ['chavePix', 'Chave PIX', false],
+    ['veiculo', 'Modelo do veículo', true], ['cor', 'Cor', false], ['placa', 'Placa', false],
+  ];
+
+  let api = null, db = null, perfilRef = null, recibosRef = null;
+  let motorista = {}, historico = [], proximo = 1;
+  const campos = {};
+
+  function aviso(msg) {
+    const el = $('aviso'); el.textContent = msg; el.hidden = false;
+    clearTimeout(aviso.t); aviso.t = setTimeout(() => { el.hidden = true; }, 5000);
+  }
+  const pad = (n) => String(n).padStart(2, '0');
+  function agoraTxt() { const d = new Date(); return [`${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`, `${pad(d.getHours())}:${pad(d.getMinutes())}`]; }
+  function moedaLocal(c) { return 'R$ ' + (c / 100).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+
+  // ---------- armazenamento: db privado do usuário; sem db, só o navegador
+  const local = {
+    get(k) { try { return JSON.parse(localStorage.getItem('recibo.' + k)); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem('recibo.' + k, JSON.stringify(v)); } catch (e) {} },
+  };
+  async function salvarPerfil() {
+    const dados = { motorista, proximo };
+    if (perfilRef) { try { await perfilRef.set(dados); return; } catch (e) {} }
+    local.set('perfil', dados);
+  }
+  async function salvarRecibo(r) {
+    historico = [r, ...historico.filter((x) => x.numero !== r.numero)].slice(0, 300);
+    if (recibosRef) { try { await recibosRef.doc(String(r.numero)).set(r); } catch (e) {} } else local.set('historico', historico);
+    renderHist();
+  }
+  async function excluirRecibo(n) {
+    historico = historico.filter((x) => x.numero !== n);
+    if (recibosRef) { try { await recibosRef.doc(String(n)).delete(); } catch (e) {} } else local.set('historico', historico);
+    renderHist();
+  }
+  async function conectar() {
+    try {
+      const [cdb, cuser] = await Promise.all([window.claude?.use('db'), window.claude?.use('user')]);
+      if (cdb && cuser) {
+        const id = await cuser.id();
+        db = cdb;
+        perfilRef = db.doc('data/users/' + id + '/perfil');
+        recibosRef = perfilRef.collection('recibos');
+        const limite = new Promise((_, rej) => setTimeout(() => rej(new Error('tempo')), 10000));
+        const [p, q] = await Promise.race([
+          Promise.all([perfilRef.get(), recibosRef.orderBy('numero', 'desc').limit(300).get()]), limite,
+        ]);
+        if (p.exists) { const d = p.data(); motorista = d.motorista || {}; proximo = d.proximo || 1; }
+        historico = q.docs.map((d) => d.data());
+      } else throw new Error('sem db');
+    } catch (e) {
+      const p = local.get('perfil'); if (p) { motorista = p.motorista || {}; proximo = p.proximo || 1; }
+      historico = local.get('historico') || [];
+    }
+    $('numero').value = proximo;
+    preencherMotorista(); renderHist();
+    if (!motorista.nome) $('d-motorista').open = true;
+  }
+
+  // ---------- formulário
+  function criarCampos() {
+    for (const c of JSON.parse(api.campos)) {
+      const lab = document.createElement('label');
+      if (LARGOS.has(c.nome)) lab.className = 'largo';
+      const input = document.createElement('input');
+      input.id = 'c-' + c.nome; input.autocomplete = 'off';
+      if (c.monetario || c.nome === 'km') input.inputMode = 'decimal';
+      if (c.nome === 'documento') input.inputMode = 'numeric';
+      if (c.nome === 'passageiro' || c.nome === 'empresa') input.autocapitalize = 'words';
+      if (c.monetario) input.placeholder = '0,00';
+      input.addEventListener('input', atualizarTotal);
+      // Ao sair do campo, interpreta o que foi ditado ("hoje", "duzentos reais", "duas e meia")
+      input.addEventListener('change', () => {
+        if (!input.value.trim()) return;
+        input.value = api.campo(c.nome, input.value); atualizarTotal();
+      });
+      lab.append((c.monetario ? c.rotulo + ' (R$)' : c.rotulo) + (OBRIG.has(c.nome) ? ' *' : ''), input);
+      $(GRUPOS[c.nome]).append(lab);
+      campos[c.nome] = input;
+    }
+  }
+  function centavos(n) { const v = campos[n].value.trim(); return v ? api.valor(v) : 0; }
+  function total() { return centavos('valor') + centavos('pedagio') + centavos('estacionamento') + centavos('outros'); }
+  function atualizarTotal() {
+    const t = total();
+    $('total').textContent = api.moeda(t);
+    $('extenso').textContent = t > 0 ? api.extenso(t) : 'Total do recibo';
+  }
+  function novo() {
+    for (const k in campos) campos[k].value = '';
+    const [d, h] = agoraTxt(); campos.data.value = d; campos.hora.value = h;
+    $('numero').value = proximo; $('ditado').value = ''; $('chips').replaceChildren();
+    atualizarTotal();
+  }
+  function aplicarDitado() {
+    const texto = $('ditado').value.trim();
+    if (!texto) { aviso('Toque na caixa, use o microfone do teclado e fale os dados.'); $('ditado').focus(); return; }
+    const r = JSON.parse(api.ditado(texto));
+    const nomes = Object.keys(r.campos);
+    if (!nomes.length) { aviso('Nenhum campo reconhecido. Comece cada dado pelo nome do campo, como "passageiro" ou "valor".'); return; }
+    const chips = [];
+    const rotulos = Object.fromEntries(JSON.parse(api.campos).map((c) => [c.nome, c.rotulo]));
+    for (const n of nomes) {
+      campos[n].value = r.campos[n];
+      const s = document.createElement('span'); s.className = 'chip'; s.textContent = '✓ ' + rotulos[n]; chips.push(s);
+    }
+    $('chips').replaceChildren(...chips);
+    atualizarTotal();
+    aviso(nomes.length + ' campo(s) preenchido(s). Confira e toque em Gerar PDF.');
+    if (r.imprimir) gerar();
+  }
+  function montar() {
+    const g = (n) => campos[n].value.trim();
+    const iso = api.data(g('data'));
+    return {
+      numero: parseInt($('numero').value, 10) || proximo,
+      emissao: new Date().toISOString(),
+      passageiro: g('passageiro'), documento: g('documento'), empresa: g('empresa'),
+      dataViagem: iso || null, hora: g('hora'), origem: g('origem'), destino: g('destino'), km: g('km'),
+      valorCorrida: centavos('valor'), pedagio: centavos('pedagio'), estacionamento: centavos('estacionamento'),
+      outros: centavos('outros'), pagamento: g('pagamento'), observacoes: g('observacoes'),
+    };
+  }
+  function carregar(r, comoNovo) {
+    const v = (c) => (c ? (c / 100).toFixed(2).replace('.', ',') : '');
+    Object.assign(campos.passageiro, { value: r.passageiro || '' });
+    campos.documento.value = r.documento || ''; campos.empresa.value = r.empresa || '';
+    campos.origem.value = r.origem || ''; campos.destino.value = r.destino || ''; campos.km.value = r.km || '';
+    campos.valor.value = v(r.valorCorrida); campos.pedagio.value = v(r.pedagio);
+    campos.estacionamento.value = v(r.estacionamento); campos.outros.value = v(r.outros);
+    campos.pagamento.value = r.pagamento || ''; campos.observacoes.value = r.observacoes || '';
+    const [d, h] = agoraTxt();
+    campos.data.value = d; campos.hora.value = comoNovo ? h : (r.hora || h);
+    $('numero').value = proximo;
+    atualizarTotal(); window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ---------- PDF
+  async function salvarPdf(r) {
+    const bytes = await api.pdf(JSON.stringify(r), JSON.stringify(motorista));
+    const nome = 'Recibo_' + String(r.numero).padStart(6, '0') + '.pdf';
+    const dl = await window.claude?.use('downloads');
+    if (!dl) throw { code: 'unavailable' };
+    return dl.save({ filename: nome, data: new Blob([bytes], { type: 'application/pdf' }) });
+  }
+  async function gerar() {
+    let ok = true;
+    for (const n of OBRIG) { const bad = !campos[n].value.trim(); campos[n].parentElement.classList.toggle('erro', bad); if (bad) ok = false; }
+    if (!ok || total() <= 0) { aviso('Preencha o passageiro e o valor da corrida.'); return; }
+    if (!motorista.nome || !motorista.documento) { $('d-motorista').open = true; $('m-nome').focus(); aviso('Cadastre seu nome e CPF/CNPJ antes do primeiro recibo.'); return; }
+    const btn = $('gerar'); btn.disabled = true; btn.textContent = 'Gerando...';
+    try {
+      const r = montar();
+      await salvarPdf(r);
+      await salvarRecibo(r);
+      if (r.numero >= proximo) { proximo = r.numero + 1; await salvarPerfil(); }
+      aviso('PDF salvo. Abra o arquivo e toque em Compartilhar > Imprimir.');
+      novo();
+    } catch (e) {
+      const code = e && e.code;
+      if (code === 'declined') aviso('Download cancelado.');
+      else if (code === 'unavailable' || code === 'not_granted') aviso('Este aparelho não permitiu salvar o PDF. Abra a página no Safari, logado no claude.ai.');
+      else aviso('Não foi possível gerar o PDF. Tente de novo.');
+    } finally { btn.disabled = false; btn.textContent = 'Gerar PDF'; }
+  }
+
+  // ---------- motorista e histórico
+  function criarMotorista() {
+    for (const [k, rot, largo, modo] of MOTORISTA) {
+      const lab = document.createElement('label'); if (largo) lab.className = 'largo';
+      const i = document.createElement('input'); i.id = 'm-' + k; if (modo) i.inputMode = modo;
+      lab.append(rot, i); $('g-motorista').append(lab);
+    }
+  }
+  function preencherMotorista() {
+    for (const [k] of MOTORISTA) $('m-' + k).value = motorista[k] || '';
+    $('m-resumo').textContent = motorista.nome || 'não cadastrado';
+  }
+  async function salvarMotorista() {
+    const m = {};
+    for (const [k] of MOTORISTA) m[k] = $('m-' + k).value.trim();
+    if (!m.nome || !m.documento) { aviso('Nome e CPF/CNPJ são obrigatórios.'); return; }
+    m.documento = api.documento(m.documento); m.placa = m.placa.toUpperCase();
+    motorista = m; await salvarPerfil(); preencherMotorista();
+    $('d-motorista').open = false; aviso('Dados salvos.');
+  }
+  function renderHist() {
+    const box = $('hist');
+    const soma = historico.reduce((s, r) => s + (r.valorCorrida || 0) + (r.pedagio || 0) + (r.estacionamento || 0) + (r.outros || 0), 0);
+    $('h-resumo').textContent = historico.length ? historico.length + ' recibo(s) · ' + moedaLocal(soma) : 'nenhum recibo';
+    if (!historico.length) { box.innerHTML = '<p class="vazio">Os recibos gerados aparecem aqui, com segunda via e "repetir viagem".</p>'; return; }
+    box.replaceChildren(...historico.map((r) => {
+      const t = (r.valorCorrida || 0) + (r.pedagio || 0) + (r.estacionamento || 0) + (r.outros || 0);
+      const d = document.createElement('div'); d.className = 'hist-item';
+      const a = document.createElement('span'); a.textContent = 'Nº ' + String(r.numero).padStart(6, '0') + ' · ' + (r.passageiro || '-');
+      const b = document.createElement('b'); b.textContent = moedaLocal(t);
+      const s = document.createElement('small');
+      const data = r.dataViagem ? new Date(r.dataViagem).toLocaleDateString('pt-BR') : '';
+      s.textContent = [data, r.hora, (r.origem || '-') + ' → ' + (r.destino || '-')].filter(Boolean).join(' · ');
+      const bt = document.createElement('div'); bt.className = 'botoes';
+      const b1 = document.createElement('button'); b1.type = 'button'; b1.textContent = 'Segunda via';
+      b1.onclick = async () => { try { await salvarPdf(r); aviso('Segunda via salva.'); } catch (e) { aviso('Não foi possível salvar o PDF.'); } };
+      const b2 = document.createElement('button'); b2.type = 'button'; b2.textContent = 'Repetir viagem';
+      b2.onclick = () => { carregar(r, true); aviso('Dados copiados para um novo recibo.'); };
+      const b3 = document.createElement('button'); b3.type = 'button'; b3.textContent = 'Excluir';
+      b3.onclick = () => {
+        if (b3.dataset.confirmar) { excluirRecibo(r.numero); return; }
+        b3.dataset.confirmar = '1'; b3.textContent = 'Confirmar exclusão';
+      };
+      bt.append(b1, b2, b3); d.append(a, b, s, bt); return d;
+    }));
+  }
+
+  // ---------- início
+  function iniciar() {
+    api = window.reciboApi;
+    if (!api) { setTimeout(iniciar, 30); return; }
+    criarCampos(); criarMotorista(); novo();
+    $('aplicar').onclick = aplicarDitado;
+    $('gerar').onclick = gerar;
+    $('limpar').onclick = novo;
+    $('salvar-m').onclick = salvarMotorista;
+    conectar();
+  }
+  iniciar();
+})();
+</script>
