@@ -1,0 +1,29 @@
+name: recibo_executivo
+description: Emissão de recibos A4 de transporte executivo de passageiros, com preenchimento por voz e impressão em impressora portátil Bluetooth.
+publish_to: none
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # Reconhecimento de voz nativo (Siri Speech no iOS, Google no Android)
+  speech_to_text: ^7.0.0
+  # Geração do PDF A4 (Dart puro)
+  pdf: ^3.11.1
+  # Impressão pelo sistema (AirPrint no iOS, serviço de impressão no Android) e compartilhamento
+  printing: ^5.13.4
+  # Dados do motorista, numeração e histórico
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
